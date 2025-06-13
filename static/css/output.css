@@ -10,6 +10,8 @@
     --spacing: 0.25rem;
     --text-xl: 1.25rem;
     --text-xl--line-height: calc(1.75 / 1.25);
+    --text-2xl: 1.5rem;
+    --text-2xl--line-height: calc(2 / 1.5);
     --text-3xl: 1.875rem;
     --text-3xl--line-height: calc(2.25 / 1.875);
     --text-4xl: 2.25rem;
@@ -1704,6 +1706,9 @@
   .mt-6 {
     margin-top: calc(var(--spacing) * 6);
   }
+  .mt-auto {
+    margin-top: auto;
+  }
   .mb-2 {
     margin-bottom: calc(var(--spacing) * 2);
   }
@@ -1842,6 +1847,12 @@
   .h-6 {
     height: calc(var(--spacing) * 6);
   }
+  .h-20 {
+    height: calc(var(--spacing) * 20);
+  }
+  .h-40 {
+    height: calc(var(--spacing) * 40);
+  }
   .h-60 {
     height: calc(var(--spacing) * 60);
   }
@@ -1851,11 +1862,20 @@
   .h-auto {
     height: auto;
   }
+  .h-full {
+    height: 100%;
+  }
+  .h-screen {
+    height: 100vh;
+  }
   .min-h-full {
     min-height: 100%;
   }
   .w-6 {
     width: calc(var(--spacing) * 6);
+  }
+  .w-32 {
+    width: calc(var(--spacing) * 32);
   }
   .w-40 {
     width: calc(var(--spacing) * 40);
@@ -1870,6 +1890,33 @@
     width: 100%;
   }
   .flex-1 {
+    flex: 1;
+  }
+  .flex-1\/2 {
+    flex: calc(1/2 * 100%);
+  }
+  .flex-1\/3 {
+    flex: calc(1/3 * 100%);
+  }
+  .flex-1\/4 {
+    flex: calc(1/4 * 100%);
+  }
+  .flex-2 {
+    flex: 2;
+  }
+  .flex-2\/3 {
+    flex: calc(2/3 * 100%);
+  }
+  .flex-2\/4 {
+    flex: calc(2/4 * 100%);
+  }
+  .flex-3 {
+    flex: 3;
+  }
+  .flex-3\/4 {
+    flex: calc(3/4 * 100%);
+  }
+  .flex-\[1\] {
     flex: 1;
   }
   .flex-none {
@@ -1976,6 +2023,9 @@
   .bg-base-200 {
     background-color: var(--color-base-200);
   }
+  .object-cover {
+    object-fit: cover;
+  }
   .p-2 {
     padding: calc(var(--spacing) * 2);
   }
@@ -1987,6 +2037,10 @@
   }
   .px-4 {
     padding-inline: calc(var(--spacing) * 4);
+  }
+  .text-2xl {
+    font-size: var(--text-2xl);
+    line-height: var(--tw-leading, var(--text-2xl--line-height));
   }
   .text-3xl {
     font-size: var(--text-3xl);
@@ -2076,6 +2130,11 @@
   .md\:grid-cols-3 {
     @media (width >= 48rem) {
       grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .md\:flex-row {
+    @media (width >= 48rem) {
+      flex-direction: row;
     }
   }
   .lg\:drawer-open {

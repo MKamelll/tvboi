@@ -3,7 +3,7 @@
 {% block title %}{{title}}{% endblock title %}
 
 {% block drawer_content %}
-  <div class="flex flex-row flex-wrap">
+  <div class="flex flex-col md:flex-row w-full">
     {% include "main/components/tvshowcard.html" with title=title img_src=img_src%}
     {% include "main/components/detailssection.html" with summary=summary cast=cast%}
   </div>

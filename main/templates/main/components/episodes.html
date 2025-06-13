@@ -1,0 +1,16 @@
+<div class="flex flex-col justify-start m-6 gap-6">
+  <div x-data="{ tab: '1' }" class="tabs-container">
+    <div class="tabs tabs-border">
+      <a @click="tab = '1'" :class="tab === '1' ? 'tab tab-active' : 'tab'">1</a>
+    </div>
+
+    <!-- Tab Content -->
+    <div x-show="tab === '1'" x-transition>
+      <div class="flex flex-row flex-wrap mt-6 gap-2 justify-start">
+        {% for member in cast %}
+        <button class="btn">{{member}}</button>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
