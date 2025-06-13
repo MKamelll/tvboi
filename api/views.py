@@ -1,28 +1,13 @@
 from django.http import HttpRequest, JsonResponse
-from dotenv import load_dotenv
-import os
-import httpx
+from .themovidb import TheMovieDb
 from .models import TvShow
-load_dotenv()
-
-base_url = "https://api.themoviedb.org/3"
 
 def index(request: HttpRequest) -> JsonResponse:
-    access_token = os.getenv("api_access_token")
-    assert(access_token is not None)
-    headers = {
-        "Authorization": "Bearer " + access_token,
-        "accept": "application/json"
-    }
-    parameters = {
-        "include_adult": "true",
-        "language": "en-US",
-        "page": "1",
-        "query": "breaking bad"
-    }
-    response = httpx.get(base_url + "/search/tv", headers=headers, params=parameters).json()
+    movie_api = TheMovieDb()
 
     shows: list[TvShow] = []
+
+    response = movie_api.search("Breaking bad")
 
     for result in response["results"]:
         show = TvShow()
@@ -39,5 +24,5 @@ def index(request: HttpRequest) -> JsonResponse:
     TvShow.objects.bulk_create(shows)
 
     return JsonResponse({
-        "status": "200"        
+        "status": "200"     
     })
