@@ -1,9 +1,10 @@
 {% extends "main/dashboard.html" %}
 
-{% block title %}Breaking Bad{% endblock title %}
+{% block title %}{{title}}{% endblock title %}
 
 {% block drawer_content %}
-<div class="flex flex-col items-start p-2">
-    {% include "main/components/card.html" with title='Breaking Bad' content='fuck off' button='fuck' %}
-</div>
+  <div class="flex flex-row flex-wrap">
+    {% include "main/components/tvshowcard.html" with title=title img_src=img_src%}
+    {% include "main/components/detailssection.html" with summary=summary cast=cast%}
+  </div>
 {% endblock drawer_content %}

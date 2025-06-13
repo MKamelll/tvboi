@@ -1,0 +1,34 @@
+<div class="flex flex-col justify-start m-6 gap-6">
+    <div class="flex flex-row flex-wrap bg-base-200 shadow-md p-6">
+        <p class="flex-1">{{summary}}</p>
+    </div>
+    <div x-data="{ tab: 'cast' }" class="tabs-container">
+        <div class="tabs tabs-border">
+          <a @click="tab = 'cast'" :class="tab === 'cast' ? 'tab tab-active' : 'tab'">Cast</a>
+          <a @click="tab = 'writers'" :class="tab === 'writers' ? 'tab tab-active' : 'tab'">Writers</a>
+          <a @click="tab = 'directors'" :class="tab === 'directors' ? 'tab tab-active' : 'tab'">Directors</a>
+          <a @click="tab = 'episodes'" :class="tab === 'episodes' ? 'tab tab-active' : 'tab'">Episodes</a>
+        </div>
+      
+        <!-- Tab Content -->
+        <div x-show="tab === 'cast'" x-transition>
+            <div class="flex flex-row flex-wrap mt-6 gap-2 justify-start">
+                {% for member in cast %}
+                    <button class="btn">{{member}}</button>
+                {% endfor %}
+            </div>
+        </div>
+      
+        <div x-show="tab === 'writers'" x-transition>
+          <p>Crew content goes here...</p>
+        </div>
+      
+        <div x-show="tab === 'directors'" x-transition>
+          <p>Details content goes here...</p>
+        </div>
+
+        <div x-show="tab === 'episodes'" x-transition>
+            <p>Details content goes here...</p>
+          </div>
+      </div>
+</div>

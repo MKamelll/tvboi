@@ -1,4 +1,7 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6">
-    {% include "main/components/card.html" with title='card' content='fuck off' button='hey' %}
-    {% include "main/components/card.html" with title='card' content='fuck off' button='hey' %}
+    {% if items %}
+        {% for item in items %}
+            {% include "main/components/tvshowcard.html" with title=item.title action=item.action %}
+        {% endfor %}    
+    {% endif %}
 </div>
