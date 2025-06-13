@@ -1,2 +1,5 @@
 Django
-django-stubs
+django-stubs[compatible-mypy]
+django-stubs-ext
+httpx
+python-dotenv
