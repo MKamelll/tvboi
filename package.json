@@ -1,0 +1,27 @@
+{
+  "name": "tvboi",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx @tailwindcss/cli -i ./static/css/input.css -o ./static/css/output.css && templ generate resources/ && go build -o app main.go",
+    "dev": "concurrently \"npm:css\" \"npm:templ\" \"npm:watch\"",
+    "watch": "nodemon",
+    "templ": "templ generate --watch resources/",
+    "css": "npx @tailwindcss/cli -i ./static/css/input.css -o ./static/css/output.css --watch",
+    "postinstall": "cp node_modules/htmx.org/dist/htmx.min.js static/js/"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.9",
+    "daisyui": "^5.0.43",
+    "htmx.org": "^2.0.4",
+    "tailwindcss": "^4.1.9"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "nodemon": "^3.1.10"
+  }
+}

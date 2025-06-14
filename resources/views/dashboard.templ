@@ -1,0 +1,23 @@
+package views
+
+import "github.com/mkamelll/tvboi/resources/components"
+
+templ Dashboard(title string) {
+@Index(title) {
+<div class="drawer lg:drawer-open">
+    <input id="my-drawer" type="checkbox" class="drawer-toggle" />
+    <div class="drawer-content flex flex-col items-start">
+        @components.Navbar("Dashboard")
+        {children...}
+    </div>
+    <div class="drawer-side">
+        <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+        <ul class="menu bg-base-200 text-base-content min-h-full w-40 p-4">
+            @components.Seachbar()
+            <li><a>Profile</a></li>
+            <li><a>Settings</a></li>
+        </ul>
+    </div>
+</div>
+}
+}

@@ -1,0 +1,13 @@
+package views
+
+import "github.com/mkamelll/tvboi/api"
+import "github.com/mkamelll/tvboi/resources/components"
+
+templ TVshow(show api.TVshow) {
+@Dashboard(show.Name) {
+<div class="flex flex-col md:flex-row w-full">
+    @components.TVshowCard(show.Name, show.PosterPath, "Add To Watchlist")
+    @components.DetailsSection(show.Overview, show.Cast)
+</div>
+}
+}

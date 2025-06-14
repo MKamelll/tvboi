@@ -1,0 +1,8 @@
+{
+    "watch": ["*.go", "**/*.go"],
+    "ignore": ["node_modules", "assets", "dist", "public"],
+    "ext": "go,js",
+    "exec": "go run main.go",
+    "signal": "SIGTERM"
+}
+  

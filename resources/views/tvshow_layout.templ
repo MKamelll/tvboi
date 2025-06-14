@@ -1,0 +1,14 @@
+package views
+
+import "github.com/mkamelll/tvboi/api"
+import "github.com/mkamelll/tvboi/resources/components"
+
+templ TVshowLayout(shows []api.TVshow) {
+@Dashboard("TVboi") {
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6">
+    for _, show := range shows {
+    @components.TVshowCard(show.Name, show.PosterPath, "View Details")
+    }
+</div>
+}
+}
