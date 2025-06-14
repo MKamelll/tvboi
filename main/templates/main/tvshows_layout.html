@@ -1,7 +1,0 @@
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6">
-    {% if items %}
-        {% for item in items %}
-            {% include "main/components/tvshowcard.html" with title=item.title action=item.action %}
-        {% endfor %}    
-    {% endif %}
-</div>

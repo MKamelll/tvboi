@@ -1,2 +1,0 @@
-# tvboi
-tv progress tracker
