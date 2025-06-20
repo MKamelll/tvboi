@@ -10,11 +10,14 @@ def index(request: HttpRequest) -> JsonResponse:
             "status": "500",
             "message": "query parameter cannot be empty"
         })
-
-    response = movie_api.search(search_query)
-    shows = TvShow.insert_shows_from_api_response(response=response)
+    
+    shows = TvShow.get_matching_shows(search_query)
+    
+    if len(shows) < 1:
+        response = movie_api.search(search_query)
+        shows = TvShow.insert_shows_from_api_response(response=response)
 
     return JsonResponse({
         "status": "200",
-        "message": list(shows)
+        "message": shows
     })

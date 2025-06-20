@@ -1,5 +1,6 @@
 from __future__ import annotations
 from django.db import models
+from django.forms.models import model_to_dict
 from typing import Any
 
 class TvShow(models.Model):
@@ -17,7 +18,7 @@ class TvShow(models.Model):
         return TvShow.objects.filter(name=tvshow_name).exists()
     
     @staticmethod
-    def insert_shows_from_api_response(response: Any) -> list[TvShow]:
+    def insert_shows_from_api_response(response: Any) -> list[dict[str, Any]]:
         shows: list[TvShow] = []
         for result in response["results"]:
             show = TvShow()
@@ -34,4 +35,8 @@ class TvShow(models.Model):
 
         TvShow.objects.bulk_create(shows)
         
-        return shows
+        return [model_to_dict(i) for i in shows]
+    
+    @staticmethod
+    def get_matching_shows(show_name: str) -> list[dict[str, Any]]:
+        return [model_to_dict(i) for i in TvShow.objects.filter(name__contains=show_name)]
