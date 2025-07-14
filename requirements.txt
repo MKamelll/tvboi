@@ -3,3 +3,5 @@ django-stubs[compatible-mypy]
 django-stubs-ext
 httpx
 python-dotenv
+djangorestframework
+djangorestframework-stubs[compatible-mypy]
