@@ -22,3 +22,6 @@ class TheMovieDb:
 
     def search(self, query: str) -> Any:
         return self.make_request("/search/tv", params={"query": query})
+    
+    def details(self, show_id: int) -> Any:
+        return self.make_request(f"/tv/{show_id}")
