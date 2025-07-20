@@ -37,3 +37,6 @@ class TheMovieDb:
     
     def season(self, show_id: int, season_number: int) -> Any:
         return self.make_request(f"/tv/{show_id}/season/{season_number}")
+    
+    def episode(self, show_id: int, season_number: int, episode_number: int) -> Any:
+        return self.make_request(f"/tv/{show_id}/season/{season_number}/episode/{episode_number}")

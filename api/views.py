@@ -2,8 +2,9 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.decorators import api_view
 from .themovidb import TheMovieDb
-from .models import TvShow, TvSeason
-from .serializers import TvshowSerializer, TvSeasonSerializer
+from .models import TvShow, TvSeason, Episode
+from .serializers import TvshowSerializer, TvSeasonSerializer, EpisodeSerializer
+from .services import check_if_season_exists
 from django.utils.text import slugify
 
 @api_view(["GET"])
@@ -79,7 +80,7 @@ def details(request: Request, id: int) -> Response:
 
 @api_view(["GET"])
 def season(request: Request, show_id: int, season_number: int) -> Response:
-    season = TvSeason.objects.filter(fk=show_id, season_number=season_number).first()
+    season = check_if_season_exists(show_id=show_id, season_number=season_number)
     if season:
         sz = TvSeasonSerializer(season)
         return Response(sz.data)
@@ -104,4 +105,32 @@ def season(request: Request, show_id: int, season_number: int) -> Response:
     new_season.save()
 
     sz = TvSeasonSerializer(new_season)
+    return Response(sz.data)
+
+@api_view(["GET"])
+def episode(request: Request, show_id: int, season_number: int, episode_number: int) -> Response:
+    curr_season = check_if_season_exists(show_id=show_id, season_number=season_number)
+    if curr_season is None:
+        return Response({
+            "message": "the season that has the episode doesn't exist",
+            "status": 500
+        })
+    curr_season_id = curr_season.id
+    episode = Episode.objects.filter(fk=curr_season_id, season_number=season_number, episode_number=episode_number).first()
+    if episode:
+        sz = EpisodeSerializer(episode)
+        return Response(sz.data)
+
+    api = TheMovieDb.get_instance()
+    result = api.episode(show_id=show_id, season_number=season_number, episode_number=episode_number)
+    new_episode = Episode()
+    new_episode.id = result["id"]
+    new_episode.overview = result["overview"]
+    new_episode.name = result["name"]
+    new_episode.season_number = result["season_number"]
+    new_episode.episode_number = result["episode_number"]
+    new_episode.fk = curr_season
+
+    new_episode.save()
+    sz = EpisodeSerializer(new_episode)
     return Response(sz.data)

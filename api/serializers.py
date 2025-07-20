@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import TvShow, TvSeason
+from .models import TvShow, TvSeason, Episode
 
 class TvshowSerializer(serializers.ModelSerializer):
     class Meta:
@@ -9,4 +9,9 @@ class TvshowSerializer(serializers.ModelSerializer):
 class TvSeasonSerializer(serializers.ModelSerializer):
     class Meta:
         model = TvSeason
+        fields = "__all__"
+
+class EpisodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Episode
         fields = "__all__"
