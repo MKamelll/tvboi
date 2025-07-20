@@ -2,8 +2,8 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.decorators import api_view
 from .themovidb import TheMovieDb
-from .models import TvShow
-from .serializers import TvshowSerializer
+from .models import TvShow, TvSeason
+from .serializers import TvshowSerializer, TvSeasonSerializer
 from django.utils.text import slugify
 
 @api_view(["GET"])
@@ -13,7 +13,7 @@ def search(request: Request, slug: str) -> Response:
     if len(show) > 0:
         return Response(seriazlizer.data)
     
-    api = TheMovieDb()
+    api = TheMovieDb.get_instance()
     results = api.search(slug)
     new_shows = []
     shows = []
@@ -52,7 +52,7 @@ def details(request: Request, id: int) -> Response:
         if are_show_details_full:
             return Response(sz.data)
 
-    api = TheMovieDb()
+    api = TheMovieDb.get_instance()
     show_details = api.details(id)
     if show:
         for key, value in sz.data.items():
@@ -75,4 +75,33 @@ def details(request: Request, id: int) -> Response:
     new_show.save()
 
     sz = TvshowSerializer(new_show)
+    return Response(sz.data)
+
+@api_view(["GET"])
+def season(request: Request, show_id: int, season_number: int) -> Response:
+    season = TvSeason.objects.filter(fk=show_id, season_number=season_number).first()
+    if season:
+        sz = TvSeasonSerializer(season)
+        return Response(sz.data)
+    
+    api = TheMovieDb.get_instance()
+    result = api.season(show_id=show_id, season_number=season_number)
+
+    new_season = TvSeason()
+    new_season.id = result["id"]
+    new_season.name = result["name"]
+    new_season.poster_path = result["poster_path"]
+    new_season.overview = result["overview"]
+    new_season.season_number = result["season_number"]
+    new_season.vote_average = result["vote_average"]
+    if TvShow.objects.filter(id=show_id).exists():
+        new_season.fk = TvShow.objects.filter(id=show_id).get()
+    else:
+        return Response({
+            "message": "the show that has the season dosn't exist yet",
+            "status": 500
+        })
+    new_season.save()
+
+    sz = TvSeasonSerializer(new_season)
     return Response(sz.data)
