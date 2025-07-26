@@ -1,0 +1,19 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+  Log In
+{% endblock %}
+
+{% block content %}
+  <form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-base-200 p-6 rounded-lg shadow">
+    <div class="flex flex-col gap-2">
+      <label class="label" for="username">Username</label>
+      <input class="input" id="username" name="username" type="text" required />
+    </div>
+    <div class="flex flex-col gap-2">
+      <label class="label" for="password">Password</label>
+      <input class="input" id="password" name="password" type="password" required />
+    </div>
+    <button class="btn btn-primary col-span-full" type="submit">Log In</button>
+  </form>
+{% endblock %}

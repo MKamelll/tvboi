@@ -1,0 +1,27 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+  Sign Up
+{% endblock %}
+
+{% block content %}
+  <form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-base-200 p-6 rounded-lg shadow">
+    <div class="flex flex-col gap-2">
+      <label class="label" for="username">Username</label>
+      <input class="input" id="username" name="username" type="text" required />
+    </div>
+    <div class="flex flex-col gap-2">
+      <label class="label" for="email">Email</label>
+      <input class="input" id="email" name="email" type="text" required />
+    </div>
+    <div class="flex flex-col gap-2">
+      <label class="label" for="password">Password</label>
+      <input class="input" id="password" name="password" type="password" required />
+    </div>
+    <div class="flex flex-col gap-2">
+      <label class="label" for="confirm_passwors">Confirm Password</label>
+      <input class="input" id="confirm_password" name="confirm_password" type="password" required />
+    </div>
+    <button class="btn btn-primary col-span-full" type="submit">Sign Up</button>
+  </form>
+{% endblock %}

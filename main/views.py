@@ -22,3 +22,9 @@ def tvshow(request: HttpRequest) -> HttpResponse:
         ]
     }
     return render(request=request, template_name="main/tvshow.html", context=context)
+
+def signup(request: HttpRequest) -> HttpResponse:
+    return render(request=request, template_name="main/signup")
+
+def login(request: HttpRequest) -> HttpResponse:
+    return render(request=request, template_name="main/login")
