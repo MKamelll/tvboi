@@ -21,18 +21,7 @@ class TvSeason(models.Model):
     poster_path = models.CharField(null=True)
     season_number = models.IntegerField()
     vote_average = models.IntegerField()
-    fk = models.ForeignKey(to=TvShow, on_delete=models.CASCADE, related_name="seasons")
-
-class Episode(models.Model):
-    id = models.IntegerField(unique=True, primary_key=True)
-    overview = models.TextField(null=True)
-    name = models.CharField(null=True)
-    season_number = models.IntegerField()
-    episode_number = models.IntegerField()
-    fk = models.ForeignKey(to=TvSeason, on_delete=models.CASCADE, related_name="episodes")
-
-class Crew(models.Model):
-    fk = models.ForeignKey(to=Episode, on_delete=models.CASCADE, related_name="crew")
+    show = models.ForeignKey(to=TvShow, on_delete=models.CASCADE, related_name="seasons")
 
 class CrewMember(models.Model):
     id = models.IntegerField(unique=True, primary_key=True)
@@ -41,14 +30,19 @@ class CrewMember(models.Model):
     credit_id = models.CharField()
     name = models.CharField()
     profile_path = models.CharField()
-    fk = models.ForeignKey(to=Crew, on_delete=models.CASCADE, related_name="members")
-
-class GuestStars(models.Model):
-    fk = models.ForeignKey(to=Episode, on_delete=models.CASCADE, related_name="guest_stars")
 
 class Guest(models.Model):
     id = models.IntegerField(unique=True, primary_key=True)
     character = models.CharField()
     name = models.CharField()
     profile_path = models.CharField()
-    fk = models.ForeignKey(to=Episode, on_delete=models.CASCADE, related_name="guests")
+
+class Episode(models.Model):
+    id = models.IntegerField(unique=True, primary_key=True)
+    overview = models.TextField(null=True)
+    name = models.CharField(null=True)
+    season_number = models.IntegerField()
+    episode_number = models.IntegerField()
+    crewmembers = models.ManyToManyField(to=CrewMember, related_name="episodes")
+    guests = models.ManyToManyField(to=Guest, related_name="episodes")
+    season = models.ForeignKey(to=TvSeason, on_delete=models.CASCADE, related_name="episodes")

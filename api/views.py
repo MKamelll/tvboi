@@ -96,7 +96,7 @@ def season(request: Request, show_id: int, season_number: int) -> Response:
     new_season.season_number = result["season_number"]
     new_season.vote_average = result["vote_average"]
     if TvShow.objects.filter(id=show_id).exists():
-        new_season.fk = TvShow.objects.filter(id=show_id).get()
+        new_season.show = TvShow.objects.filter(id=show_id).get()
     else:
         return Response({
             "message": "the show that has the season dosn't exist yet",
@@ -115,8 +115,7 @@ def episode(request: Request, show_id: int, season_number: int, episode_number: 
             "message": "the season that has the episode doesn't exist",
             "status": 500
         })
-    curr_season_id = curr_season.id
-    episode = Episode.objects.filter(fk=curr_season_id, season_number=season_number, episode_number=episode_number).first()
+    episode = Episode.objects.filter(season=curr_season, season_number=season_number, episode_number=episode_number).first()
     if episode:
         sz = EpisodeSerializer(episode)
         return Response(sz.data)
@@ -129,7 +128,7 @@ def episode(request: Request, show_id: int, season_number: int, episode_number: 
     new_episode.name = result["name"]
     new_episode.season_number = result["season_number"]
     new_episode.episode_number = result["episode_number"]
-    new_episode.fk = curr_season
+    new_episode.season = curr_season
 
     new_episode.save()
     sz = EpisodeSerializer(new_episode)
