@@ -1,5 +1,6 @@
 from __future__ import annotations
 from django.db import models
+from django.contrib.auth.models import User
 
 class TvShow(models.Model):
     id = models.IntegerField(unique=True, primary_key=True)
@@ -46,3 +47,19 @@ class Episode(models.Model):
     crewmembers = models.ManyToManyField(to=CrewMember, related_name="episodes")
     guests = models.ManyToManyField(to=Guest, related_name="episodes")
     season = models.ForeignKey(to=TvSeason, on_delete=models.CASCADE, related_name="episodes")
+
+class WatchedEpisode(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="watched_episodes")
+    episode = models.ForeignKey(to=Episode, on_delete=models.CASCADE, related_name="watched_by")
+    rating = models.FloatField(null=True)
+    review_comment = models.TextField(null=True)
+
+    class Meta:
+        unique_together = ("user", "episode")
+
+class WatchList(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="watchlist")
+    episode = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="in_watchlists")
+
+    class Meta:
+        unique_together = ("user", "episode")
