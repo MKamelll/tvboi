@@ -71,6 +71,7 @@ class ShowBasic(BaseModel):
     overview: str
     poster_path: str | None = None
     name: str
+    first_air_date: str | None = None
     vote_average: float
     vote_count: int
 
@@ -80,6 +81,13 @@ class ShowBasic(BaseModel):
         if v is None:
             return None
         return f"https://image.tmdb.org/t/p/w300{v}"
+
+    @field_validator("first_air_date")
+    def build_year(cls, v: str | None) -> str | None:
+        if v is None:
+            return None
+        year, month, day = v.split("-")
+        return year
 
 
 class Show(ShowBasic):

@@ -24,6 +24,8 @@ class MainWindow(QMainWindow):
         self.stack = QStackedWidget()
         self.splitter.addWidget(self.stack)
         self.splitter.setSizes([150, 450])
+        self.splitter.setStretchFactor(0, 0)
+        self.splitter.setStretchFactor(1, 1)
 
         self.dashboard_widget = DashboardWidget()
         self.stack.addWidget(self.dashboard_widget)

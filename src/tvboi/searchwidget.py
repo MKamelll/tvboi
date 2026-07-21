@@ -5,8 +5,10 @@ from PySide6.QtWidgets import (
     QListWidget,
     QProgressBar,
     QMessageBox,
+    QLabel,
+    QListWidgetItem,
 )
-from PySide6.QtCore import QThread, Signal
+from PySide6.QtCore import QThread, Signal, Qt
 from api.tmdb import api
 from api.pydantic_models import Success, Failure, SearchResults, ShowBasic
 
@@ -28,6 +30,19 @@ class SearchWorker(QThread):
                 self.error.emit(code, msg)
 
 
+class SearchResultWidget(QWidget):
+    def __init__(self, show: ShowBasic, parent: QWidget | None = None) -> None:
+        super().__init__(parent=parent)
+        self.main_layout = QVBoxLayout(self)
+        self.name_label = QLabel(show.name)
+        self.air_year_label = QLabel(show.first_air_date or "N/A")
+        self.overview_label = QLabel(show.overview or "N/A")
+        self.overview_label.setWordWrap(True)
+        self.main_layout.addWidget(self.name_label)
+        self.main_layout.addWidget(self.air_year_label)
+        self.main_layout.addWidget(self.overview_label)
+
+
 class SearchWidget(QWidget):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent=parent)
@@ -35,6 +50,9 @@ class SearchWidget(QWidget):
         self.search_bar = QLineEdit(placeholderText="search...")
         self.search_bar.returnPressed.connect(self.on_return_pressed)
         self.shows_list = QListWidget()
+        self.shows_list.setHorizontalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+        )
         self.progress_bar = QProgressBar()
         self.progress_bar.setRange(0, 0)
         self.progress_bar.hide()
@@ -52,8 +70,11 @@ class SearchWidget(QWidget):
         self.worker.start()
 
     def on_result(self, page: int, shows: list[ShowBasic]) -> None:
-        titles = [show.name for show in shows]
-        self.shows_list.addItems(titles)
+        for show in shows:
+            widget = SearchResultWidget(show)
+            item = QListWidgetItem(self.shows_list)
+            item.setSizeHint(widget.sizeHint())
+            self.shows_list.setItemWidget(item, widget)
 
     def on_error(self, code: int, msg: str) -> None:
         QMessageBox.warning(self, "Search Failed", f"code: {code}, {msg}")
