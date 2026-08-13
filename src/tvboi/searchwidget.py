@@ -9,9 +9,9 @@ from PySide6.QtWidgets import (
     QListWidgetItem,
 )
 from PySide6.QtCore import QThread, Signal, Qt
-from api.tmdb import api
-from api.pydantic_models import Success, Failure, SearchResults, ShowBasic, Show
-from showdetailswidget import ShowDetailsWidget
+from api.tmdb import api, TmdbResponseException  # type: ignore
+from api.pydantic_models import SearchResults, ShowBasic, Show  # type: ignore
+from showdetailswidget import ShowDetailsWidget  # type: ignore
 
 
 class SearchWorker(QThread):
@@ -23,12 +23,11 @@ class SearchWorker(QThread):
         self.query = query
 
     def run(self) -> None:
-        res = api.search_for_show(self.query)
-        match res:
-            case Success(data=SearchResults(page=page, results=results)):
-                self.result.emit(page, results)
-            case Failure(status_code=code, status_message=msg):
-                self.error.emit(code, msg)
+        try:
+            search_results = api.search_for_show(self.query)
+            self.result.emit(search_results.page, search_results.results)
+        except TmdbResponseException as e:
+            self.error.emit(e.status_code, e.status_message)
 
 
 class ShowDetailsWorker(QThread):
@@ -40,12 +39,11 @@ class ShowDetailsWorker(QThread):
         self.tv_show = show
 
     def run(self) -> None:
-        res = api.get_show_details(self.tv_show.id)
-        match res:
-            case Success(data=show):
-                self.result.emit(show)
-            case Failure(status_code=code, status_message=msg):
-                self.error.emit(code, msg)
+        try:
+            show = api.get_show_details(self.tv_show.id)
+            self.result.emit(show)
+        except TmdbResponseException as e:
+            self.error.emit(e.status_code, e.status_message)
 
 
 class SearchResultWidget(QWidget):
@@ -69,7 +67,8 @@ class SearchWidget(QWidget):
         self.search_bar = QLineEdit(placeholderText="search...")
         self.search_bar.returnPressed.connect(self.on_return_pressed)
         self.shows_list = QListWidget()
-        self.shows_list.itemDoubleClicked.connect(self.on_item_double_click)
+        self.shows_list.itemActivated.connect(self.load_show_details)
+        self.shows_list.item
         self.shows_list.setHorizontalScrollBarPolicy(
             Qt.ScrollBarPolicy.ScrollBarAlwaysOff
         )
@@ -80,7 +79,7 @@ class SearchWidget(QWidget):
         self.main_layout.addWidget(self.shows_list)
         self.main_layout.addWidget(self.progress_bar)
 
-    def on_item_double_click(self, item: QListWidgetItem) -> None:
+    def load_show_details(self, item: QListWidgetItem) -> None:
         widget = self.shows_list.itemWidget(item)
         if widget is None:
             return
@@ -103,6 +102,7 @@ class SearchWidget(QWidget):
 
     def on_return_pressed(self) -> None:
         query = self.search_bar.text()
+        self.shows_list.clear()
         self.search_worker = SearchWorker(query)
         self.search_worker.started.connect(self.progress_bar.show)
         self.search_worker.finished.connect(self.progress_bar.hide)

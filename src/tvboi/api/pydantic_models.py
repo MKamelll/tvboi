@@ -49,7 +49,7 @@ class SeasonBasic(BaseModel):
     poster_path: str | None = None
     season_number: int
     vote_average: float
-    episode_count: int
+    episode_count: int | None = None
 
     @field_validator("poster_path")
     @classmethod
@@ -61,6 +61,13 @@ class SeasonBasic(BaseModel):
 
 class Season(SeasonBasic):
     episodes: list[Episode]
+
+    @field_validator("episode_count")
+    @classmethod
+    def build_episode_count(cls, v: int | None) -> int:
+        if v is None:
+            return 0
+        return len(cls.episodes)
 
 
 class ShowBasic(BaseModel):
@@ -99,10 +106,6 @@ class Show(ShowBasic):
 class SearchResults(BaseModel):
     page: int
     results: list[ShowBasic]
-
-
-class Success[T](BaseModel):
-    data: T
 
 
 class Failure(BaseModel):

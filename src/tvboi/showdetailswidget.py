@@ -11,11 +11,12 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSplitter,
     QTabWidget,
+    QGridLayout,
 )
 
 from PySide6.QtCore import QThread, Signal, Qt
-from api.pydantic_models import ShowBasic, Show, Success, Failure, SeasonBasic
-from api.tmdb import api
+from api.pydantic_models import SeasonBasic, Episode, Show, Season  # type: ignore
+from api.tmdb import api, TmdbException  # type: ignore
 
 
 class InfoGroupWidget(QGroupBox):
@@ -27,6 +28,66 @@ class InfoGroupWidget(QGroupBox):
         label = QLabel(body)
         label.setWordWrap(wrap)
         layout.addWidget(label)
+
+
+class SeasonTabEpisodeWidget(QWidget):
+    def __init__(self, episode: Episode, parent: QWidget | None = None) -> None:
+        super().__init__(parent=parent)
+        self.episode = episode
+        self.grid = QGridLayout(self)
+        self.grid.addWidget(
+            QLabel(f"Episode {episode.episode_number}: {episode.name}"), 0, 0, 1, 2
+        )
+        overview_label = QLabel(episode.overview)
+        overview_label.setWordWrap(True)
+        self.grid.addWidget(overview_label, 1, 0, 3, 3)
+
+
+class SeasonTabEpisodeListWidget(QWidget):
+    def __init__(
+        self, show_id: int, season_number: int, parent: QWidget | None = None
+    ) -> None:
+        super().__init__(parent=parent)
+        self.show_id = show_id
+        self.season_number = season_number
+        self.vbox = QVBoxLayout(self)
+        self.episode_list = QListWidget(self)
+        self.vbox.addWidget(self.episode_list)
+
+    def load(self) -> None:
+        if self.episode_list.count() > 0:
+            return
+        self.episodes_worker = SeasonEpisodesWorker(self.show_id, self.season_number)
+        self.episodes_worker.result.connect(self.on_result)
+        self.episodes_worker.error.connect(self.on_error)
+        self.episodes_worker.start()
+
+    def on_result(self, episodes: list[Episode]) -> None:
+        for episode in episodes:
+            item = QListWidgetItem(self.episode_list)
+            episode_widget = SeasonTabEpisodeWidget(episode, self.episode_list)
+            item.setSizeHint(episode_widget.sizeHint())
+            self.episode_list.setItemWidget(item, episode_widget)
+
+    def on_error(self, error: str) -> None:
+        QMessageBox.warning(self, "Episodes Request Failed", error)
+
+
+class SeasonEpisodesWorker(QThread):
+    result = Signal(list)
+    error = Signal(str)
+
+    def __init__(self, show_id: int, season_number: int) -> None:
+        super().__init__()
+        self.show_id = show_id
+        self.season_number = season_number
+
+    def run(self) -> None:
+        try:
+            season = api.get_season_details(self.show_id, self.season_number)
+            self.result.emit(season.episodes)
+        except TmdbException as e:
+            self.error.emit(str(e))
 
 
 class ShowInfoWidget(QWidget):
@@ -72,20 +133,37 @@ class ShowInfoWidget(QWidget):
         self.overview_gp = InfoGroupWidget("Overview", self.tv_show.overview, wrap=True)
         self.right_layout.addWidget(self.overview_gp)
         self.tab_widget = QTabWidget()
+        self.tab_widget.currentChanged.connect(self.on_tab_changed)
         self.specials_season: SeasonBasic | None = None
         for season in self.tv_show.seasons:
             if "specials" in season.name.lower():
                 self.specials_season = season
                 continue
-            self.tab_widget.addTab(QLabel(season.name), season.name)
+            self.tab_widget.addTab(
+                SeasonTabEpisodeListWidget(
+                    show_id=self.tv_show.id, season_number=season.season_number
+                ),
+                season.name,
+            )
         if self.specials_season:
             self.tab_widget.addTab(
-                QLabel(self.specials_season.name), self.specials_season.name
+                SeasonTabEpisodeListWidget(
+                    show_id=self.tv_show.id,
+                    season_number=self.specials_season.season_number,
+                ),
+                self.specials_season.name,
             )
         self.right_layout.addWidget(self.tab_widget)
 
         self.splitter.addWidget(self.right_widget)
         self.main_layout.addWidget(self.splitter)
+
+    def on_tab_changed(self, current_index: int) -> None:
+        widget = self.tab_widget.widget(current_index)
+        if not widget:
+            return
+        if isinstance(widget, SeasonTabEpisodeListWidget):
+            widget.load()
 
 
 class ShowDetailsWidget(QWidget):
