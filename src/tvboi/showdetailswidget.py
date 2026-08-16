@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
     QSplitter,
     QTabWidget,
     QGridLayout,
+    QPushButton,
 )
 
 from PySide6.QtCore import QThread, Signal, Qt
@@ -41,6 +42,22 @@ class SeasonTabEpisodeWidget(QWidget):
         overview_label = QLabel(episode.overview)
         overview_label.setWordWrap(True)
         self.grid.addWidget(overview_label, 1, 0, 3, 3)
+        self.watch_status_toggle = QPushButton("Mark Episode")
+        self.watch_status_toggle.setCheckable(True)
+        self.watch_status_toggle.toggled.connect(self.on_watch_status_toggle)
+        self.watch_status_toggle.setStyleSheet(
+            r"QPushButton:checked {background-color: green; }"
+        )
+        self.grid.addWidget(self.watch_status_toggle, 0, 2, 1, 1)
+
+    def on_watch_status_toggle(self, checked: bool) -> None:
+        if checked:
+            self.watch_status_toggle.setText("Episode Marked")
+        else:
+            self.watch_status_toggle.setText("Mark Episode")
+
+    def toggle_watch_status(self, checked: bool) -> None:
+        self.watch_status_toggle.setChecked(checked)
 
 
 class SeasonTabEpisodeListWidget(QWidget):
@@ -51,8 +68,31 @@ class SeasonTabEpisodeListWidget(QWidget):
         self.show_id = show_id
         self.season_number = season_number
         self.vbox = QVBoxLayout(self)
+        self.season_watch_status_toggle = QPushButton("Mark Whole Season")
+        self.season_watch_status_toggle.setCheckable(True)
+        self.season_watch_status_toggle.setStyleSheet(
+            r"QPushButton:checked {background-color: green; }"
+        )
+        self.season_watch_status_toggle.toggled.connect(
+            self.on_season_watch_status_toggle
+        )
         self.episode_list = QListWidget(self)
+        self.vbox.addWidget(self.season_watch_status_toggle)
         self.vbox.addWidget(self.episode_list)
+
+    def on_season_watch_status_toggle(self, checked: bool) -> None:
+        if checked:
+            self.season_watch_status_toggle.setText("Season Marked")
+        else:
+            self.season_watch_status_toggle.setText("Mark Season")
+        self.toggle_all_episodes(checked=checked)
+
+    def toggle_all_episodes(self, checked: bool) -> None:
+        for i in range(self.episode_list.count()):
+            item = self.episode_list.item(i)
+            widget = self.episode_list.itemWidget(item)
+            if isinstance(widget, SeasonTabEpisodeWidget):
+                widget.toggle_watch_status(checked=checked)
 
     def load(self) -> None:
         if self.episode_list.count() > 0:
